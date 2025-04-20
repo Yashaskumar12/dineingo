@@ -91,14 +91,49 @@ const ReservationPreview: React.FC = () => {
     if (type === 'restaurant') {
       // Navigate to table selection with all the form data
       const queryParams = new URLSearchParams(searchParams);
+      // Add all form data to query params
       Object.entries(formData).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
+        if (value) queryParams.set(key, value);
       });
+      // Add reservation details
+      if (date) queryParams.set('date', date);
+      if (time) queryParams.set('time', time);
+      if (guests) queryParams.set('guests', guests);
       navigate(`/restaurant/${id}/table-selection?${queryParams.toString()}`);
     } else {
       // For events, proceed to event registration confirmation
-      console.log('Event registration details:', { ...formData, time, date });
-      // Navigate to event confirmation page or show success message
+      const eventData = {
+        ...formData,
+        time,
+        date,
+        eventId: id,
+        eventName: event?.name,
+        eventCategory: event?.category
+      };
+      // Send email with event registration details
+      sendEmail(eventData);
+      // Navigate to event confirmation page
+      navigate(`/event/${id}/confirmation?${new URLSearchParams(eventData).toString()}`);
+    }
+  };
+
+  const sendEmail = async (data: any) => {
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+      
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Error sending email:', error);
     }
   };
 
@@ -316,9 +351,9 @@ const ReservationPreview: React.FC = () => {
             <div className="flex justify-end mt-8">
               <button
                 type="submit"
-                className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors"
+                className="px-6 py-3 rounded-xl transition-colors bg-black text-white hover:bg-gray-800"
               >
-                Next
+                Proceed
               </button>
             </div>
           </form>

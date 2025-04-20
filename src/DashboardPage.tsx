@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Menu, MapPin, Heart, X, Bell, Settings, Globe, ArrowLeft, Moon, Sun, Calendar, Clock, Check } from 'lucide-react';
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { storeUserData } from "./dbUtils";
@@ -10,6 +10,7 @@ import { mockRestaurants, mockEvents } from './utils/mockData';
 import { GeocodingService } from './services/geocodingService';
 import { indianCities } from './utils/indianCities';
 import SkeletonLoading from './components/SkeletonLoading';
+import { toast } from 'react-toastify';
 
 interface UserData {
   uid: string;
@@ -462,6 +463,7 @@ export default function DashboardPage() {
   const [filteredCities, setFilteredCities] = useState(indianCities);
   const [searchTerm, setSearchTerm] = useState('');
   const [homeSection, setHomeSection] = useState<'restaurants' | 'events'>('restaurants');
+  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -1590,6 +1592,26 @@ export default function DashboardPage() {
       prevNotifications.map(notification => ({ ...notification, read: true }))
     );
   };
+
+  useEffect(() => {
+    // Show success toast when redirected from reservation confirmation
+    if (location.state?.reservationSuccess) {
+      toast.success(
+        `Reservation confirmed at ${location.state.restaurantName}! Check your email for details.`,
+        {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+      // Clear the state to prevent showing the toast again on refresh
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   if (error) {
     return (

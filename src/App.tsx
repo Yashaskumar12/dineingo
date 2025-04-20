@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import DashboardPage from './DashboardPage';
 import RestaurantDetails from './pages/RestaurantDetails';
 import ReservationPreview from './pages/ReservationPreview';
+import TableSelection from './pages/TableSelection';
+import ReservationDetailsPage from './pages/ReservationDetailsPage';
 import { UserData, CityLocation } from './types';
 
 const App: React.FC = () => {
@@ -53,6 +57,18 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -71,6 +87,8 @@ const App: React.FC = () => {
         />
         <Route path="/restaurant/:id" element={<RestaurantDetails />} />
         <Route path="/restaurant/:id/preview" element={<ReservationPreview />} />
+        <Route path="/restaurant/:id/table-selection" element={<TableSelection />} />
+        <Route path="/restaurant/:id/reservation" element={<ReservationDetailsPage />} />
       </Routes>
     </Router>
   );
